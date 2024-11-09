@@ -1173,13 +1173,15 @@ class Trainer:
 
     def _compute_grad_norm(self, optimizer: torch.optim.Optimizer):
         # Added a filter for none value
-        grad_list = []
-        for param in self.master_params(optimizer):
-            if param.grad is None:
-                pass
-            else:
-                grad_list.append(param.grad.view(-1))
-        return torch.norm(torch.cat(grad_list, dim=0), p=2)
+
+        # Filter out parameters with None gradients
+        grad_tensors = [param.grad.view(-1) for param in self.master_params(optimizer) if param.grad is not None]
+        
+        # Check if there are gradients to avoid errors in torch.cat if grad_tensors is empty
+        if grad_tensors:
+            return torch.norm(torch.cat(grad_tensors, dim=0), p=2)
+        else:
+            return 0.0 
 
     def _grad_clipping(self, grad_clip: float, optimizer: torch.optim.Optimizer, scaler: "AMPScaler"):
         """Perform gradient clipping"""
