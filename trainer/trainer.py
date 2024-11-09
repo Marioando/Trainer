@@ -1179,7 +1179,10 @@ class Trainer:
         
         # Check if there are gradients to avoid errors in torch.cat if grad_tensors is empty
         if grad_tensors:
-            return torch.norm(torch.cat(grad_tensors, dim=0), p=2)
+            grad_norm = torch.norm(torch.cat(grad_tensors, dim=0), p=2)
+            print("#"*100)
+            print("Grad norm value : ", grad_norm.shape)
+            return 
         else:
             return 0.0 
 
